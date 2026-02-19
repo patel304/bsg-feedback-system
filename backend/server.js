@@ -15,12 +15,25 @@ const app = express();
 */
 
 // CORS Configuration (Allow frontend only)
-app.use(
-  cors({
-    origin: "http://localhost:5173", // change when deploying
-    credentials: true,
-  })
-);
+const cors = require("cors");
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://bsg-feedback-system.vercel.app"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow server-to-server
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
+
 
 // Body parser
 app.use(express.json());
