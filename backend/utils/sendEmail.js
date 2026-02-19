@@ -1,9 +1,11 @@
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 
-// Create transporter once (better performance)
+// Create transporter once (Production Safe SMTP)
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS, // Google App Password
@@ -13,7 +15,7 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (to, subject, text, attachmentPath) => {
   try {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      throw new Error("Email credentials not configured in .env");
+      throw new Error("Email credentials not configured properly");
     }
 
     const mailOptions = {
@@ -23,13 +25,13 @@ const sendEmail = async (to, subject, text, attachmentPath) => {
       text,
       html: `
         <div style="font-family: Arial, sans-serif;">
-          <h2>BSG India</h2>
+          <h2 style="color:#1e3a8a;">Bharat Scouts & Guides</h2>
           <p>${text.replace(/\n/g, "<br>")}</p>
         </div>
       `,
     };
 
-    // Attach certificate if path exists
+    // Attach certificate if exists
     if (attachmentPath && fs.existsSync(attachmentPath)) {
       mailOptions.attachments = [
         {
@@ -41,11 +43,11 @@ const sendEmail = async (to, subject, text, attachmentPath) => {
 
     const info = await transporter.sendMail(mailOptions);
 
-    console.log("Email sent:", info.response);
+    console.log("EMAIL SENT SUCCESSFULLY:", info.response);
 
   } catch (error) {
     console.error("SEND EMAIL ERROR:", error);
-    throw error; // Let controller handle it
+    throw error;
   }
 };
 
