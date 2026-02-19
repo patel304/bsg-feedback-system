@@ -1,6 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const cors = require("cors");
+const cors = require("cors");   // ✅ Only once
 const connectDB = require("./config/db");
 
 dotenv.config();
@@ -14,9 +14,6 @@ const app = express();
 ========================
 */
 
-// CORS Configuration (Allow frontend only)
-const cors = require("cors");
-
 const allowedOrigins = [
   "http://localhost:5173",
   "https://bsg-feedback-system.vercel.app"
@@ -24,7 +21,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow server-to-server
+    if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -34,8 +31,6 @@ app.use(cors({
   credentials: true
 }));
 
-
-// Body parser
 app.use(express.json());
 
 /*
@@ -68,14 +63,8 @@ app.use((req, res, next) => {
 */
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
-  res.status(500).json({ message: "Internal Server Error" });
+  res.status(500).json({ message: err.message || "Internal Server Error" });
 });
-
-/*
-========================
-        SERVER START
-========================
-*/
 
 const PORT = process.env.PORT || 8000;
 
